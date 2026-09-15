@@ -1,0 +1,3 @@
+<template><button :class="['ui-button',variant,{disabled,block}]" :disabled="disabled" :open-type="openType" hover-class="tap-active" @tap="$emit('tap',$event)" @getphonenumber="$emit('getphonenumber',$event)"><ui-icon v-if="icon" :name="icon" :size="34" tone="white"/><text><slot>{{label}}</slot></text></button></template>
+<script>export default{emits:['tap','getphonenumber'],props:{label:{type:String,default:''},variant:{type:String,default:'primary'},icon:{type:String,default:''},disabled:{type:Boolean,default:false},block:{type:Boolean,default:true},openType:{type:String,default:''}}}</script>
+<style scoped>.ui-button{gap:12rpx;padding:0 34rpx}.ui-button.block{width:100%}.ui-button.secondary{box-shadow:none}</style>

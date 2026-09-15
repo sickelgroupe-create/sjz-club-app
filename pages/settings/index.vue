@@ -1,0 +1,14 @@
+<template>
+  <view :class="['app-page',{dark}]">
+    <ui-header title="用户设置" back />
+    <view class="settings-card"><view v-for="item in first" :key="item.label" class="setting-row" @tap="handle(item)"><view class="setting-icon"><ui-icon :name="item.icon" :size="34"/></view><text>{{item.label}}</text><view class="setting-right"><text class="muted">{{item.value||''}}</text><ui-icon name="chevron-right" :size="28"/></view></view></view>
+    <view class="settings-card"><view v-for="item in second" :key="item.label" class="setting-row" @tap="handle(item)"><view class="setting-icon"><ui-icon :name="item.icon" :size="34"/></view><text>{{item.label}}</text><view class="setting-right"><ui-icon name="chevron-right" :size="28"/></view></view></view>
+    <view class="logout" @tap="logout">退出登录</view>
+  </view>
+</template>
+<script>
+import{isDark}from'@/utils/app'
+import{api}from'@/services/api'
+export default{data(){return{dark:false,identityStatus:'未认证',first:[],second:[{label:'关于我们',icon:'info',url:'/pages/common/document?type=about'},{label:'用户协议',icon:'document',url:'/pages/common/document?type=agreement'},{label:'隐私政策',icon:'shield-check',url:'/pages/common/document?type=privacy'},{label:'备案资质',icon:'briefcase',url:'/pages/common/document?type=filing'}]}},onShow(){this.dark=isDark();this.buildItems();if(uni.getStorageSync('token'))api.getProfile().then(user=>{const s=user.identity?.status;this.identityStatus=({pending:'审核中',approved:'已认证',rejected:'未通过'})[s]||'未认证';this.buildItems()}).catch(()=>{})},methods:{buildItems(){this.first=[{label:'账号与安全',icon:'shield-check',url:'/pages/account/bind'},{label:'青少年模式',icon:'lock',url:'/pages/settings/teen'},{label:'主题模式',icon:'sparkles',action:'theme',value:this.dark?'深色模式':'浅色模式'},{label:'通知设置',icon:'bell',url:'/pages/settings/notifications'}]},handle(item){if(item.url){uni.navigateTo({url:item.url});return}if(item.action==='theme'){this.dark=!this.dark;uni.setStorageSync('theme',this.dark?'dark':'light');this.buildItems()}},async logout(){await api.logout();uni.reLaunch({url:'/pages/profile/index'})}}}
+</script>
+<style scoped>.settings-card{margin:24rpx 28rpx;border-radius:24rpx;background:var(--surface);overflow:hidden;box-shadow:var(--shadow-card)}.setting-row{height:104rpx;padding:0 24rpx;display:flex;align-items:center;gap:18rpx;border-bottom:1rpx solid var(--line);font-size:27rpx}.setting-row:last-child{border:0}.setting-icon{width:62rpx;height:62rpx;display:flex;align-items:center;justify-content:center;border-radius:18rpx;background:var(--surface-soft)}.setting-right{margin-left:auto;display:flex;align-items:center;gap:6rpx}.logout{height:82rpx;margin:48rpx 80rpx;display:flex;align-items:center;justify-content:center;border-radius:44rpx;background:var(--primary);color:#fff;box-shadow:var(--shadow-button)}</style>

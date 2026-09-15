@@ -1,0 +1,8 @@
+{
+  "description": "品奢电竞 uni-app 微信小程序前端UI",
+  "miniprogramRoot": "dist/",
+  "projectname": "品奢电竞",
+  "appid": "wxbe47248595ecba52",
+  "setting": { "urlCheck": false, "es6": true, "postcss": true, "minified": true },
+  "compileType": "miniprogram"
+}

@@ -1,0 +1,10 @@
+import {test} from 'node:test'
+import assert from 'node:assert/strict'
+import fs from 'node:fs'
+import vm from 'node:vm'
+const source=fs.readFileSync(new URL('../pages/order/submit.vue',import.meta.url),'utf8').match(/<script>([\s\S]*?)<\/script>/)[1].replace(/^import .*$/gm,'').replace('export default','page =')
+function harness(bound=true){const calls=[];const api={newRequestId:()=> 'idem',getProduct:async()=>({id:1,playerId:bound?7:null,playerName:'绑定打手',skus:[{id:2,price:100}]}),quoteOrder:async body=>{calls.push(body);return {coupons:[],payableAmount:100}}};const c={api,isDark:()=>false,uni:{showToast:()=>{}}};vm.createContext(c);vm.runInContext(source,c);const s=c.page.data();for(const [key,fn]of Object.entries(c.page.methods))s[key]=fn.bind(s);return {s,calls,load:q=>c.page.onLoad.call(s,q)};}
+test('order form rejects a caller player that differs from the current binding',async()=>{const h=harness();await h.load({id:1,sku:2,playerId:999});assert.equal(h.s.product,null);assert.equal(h.calls.length,0);assert.match(h.s.loadError,/更换负责打手/);});
+test('unbound products cannot open a valid order form',async()=>{const h=harness(false);await h.load({id:1,sku:2});assert.equal(h.s.product,null);assert.equal(h.calls.length,0);assert.match(h.s.loadError,/绑定/);});
+test('order UI contains no optional player picker',()=>{const s=fs.readFileSync(new URL('../pages/order/submit.vue',import.meta.url),'utf8');assert.ok(!s.includes('@tap="choosePlayer"'));assert.ok(!s.includes('@tap.stop="clearPlayer"'));assert.ok(s.includes('负责打手'));});
+test('public coupon claim uses authenticated POST',async()=>{const calls=[];const source=fs.readFileSync(new URL('../services/api.js',import.meta.url),'utf8').replace(/^import .*$/gm,'').replace('export const api =','api =');const c={RUNTIME_MODE:'live',ENDPOINTS:{coupons:'/coupons'},request:o=>{calls.push(o);return Promise.resolve({})},uploadFile(){},uploadVoiceFile(){}};vm.createContext(c);vm.runInContext(source,c);await c.api.claimCoupon(5);assert.equal(calls[0].url,'/coupons/5/claim');assert.equal(calls[0].method,'POST');assert.equal(calls[0].auth,true);});

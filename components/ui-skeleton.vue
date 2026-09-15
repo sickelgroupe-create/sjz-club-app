@@ -1,0 +1,2 @@
+<template><view class="skeleton-card"><view class="skeleton image"></view><view class="copy"><view class="skeleton line wide"></view><view class="skeleton line"></view><view class="skeleton line short"></view></view></view></template>
+<style scoped>.skeleton-card{margin:20rpx 28rpx;padding:24rpx;display:flex;gap:22rpx;border-radius:24rpx;background:var(--surface)}.image{width:170rpx;height:150rpx}.copy{flex:1;padding-top:8rpx}.line{height:24rpx;margin-bottom:22rpx}.wide{width:92%}.short{width:52%}</style>
