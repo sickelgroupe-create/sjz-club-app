@@ -2,6 +2,7 @@ import crypto from 'node:crypto'
 import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { matchesTextBaseline } from './repository-text.mjs'
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const manifestPath = path.join(root, 'ui-freeze.manifest.json')
@@ -71,7 +72,11 @@ if (!fs.existsSync(manifestPath)) {
 const expected = JSON.parse(fs.readFileSync(manifestPath, 'utf8')).files || {}
 const added = Object.keys(current).filter(file => !(file in expected))
 const removed = Object.keys(expected).filter(file => !(file in current))
-const changed = Object.keys(current).filter(file => expected[file] && expected[file] !== current[file])
+const changed = Object.keys(current).filter(file => {
+  if (!expected[file] || expected[file] === current[file]) return false
+  if (file.endsWith('.svg')) return !matchesTextBaseline(fs.readFileSync(path.join(root, file)), expected[file])
+  return true
+})
 const passed = added.length === 0 && removed.length === 0 && changed.length === 0
 
 console.log(JSON.stringify({ passed, added, removed, changed }, null, 2))
@@ -79,4 +84,3 @@ if (!passed) {
   console.error('Frontend UI freeze violation. Restore the approved design or obtain explicit user authorization.')
   process.exit(1)
 }
-

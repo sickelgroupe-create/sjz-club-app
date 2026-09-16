@@ -7,6 +7,7 @@
     "sync:routes": "node scripts/sync-page-routes.mjs",
     "check:navigation": "node scripts/sync-page-routes.mjs --check && node scripts/check-navigation.mjs",
     "check:task-flows": "node scripts/check-task-flows.mjs",
+    "check:repository": "node --test scripts/test-repository-checks.mjs",
     "dev:mp-weixin": "cross-env NODE_ENV=development UNI_PLATFORM=mp-weixin UNI_INPUT_DIR=. UNI_OUTPUT_DIR=unpackage/dist/dev/mp-weixin vite",
     "build:mp-weixin": "node scripts/sync-page-routes.mjs && powershell -NoProfile -ExecutionPolicy Bypass -File scripts/prepare-build.ps1 && cross-env NODE_ENV=production UNI_PLATFORM=mp-weixin UNI_INPUT_DIR=. vite build && powershell -NoProfile -ExecutionPolicy Bypass -File scripts/copy-static.ps1",
     "build:h5": "node scripts/sync-page-routes.mjs && powershell -NoProfile -ExecutionPolicy Bypass -File scripts/prepare-build.ps1 && cross-env NODE_ENV=production UNI_PLATFORM=h5 UNI_INPUT_DIR=. vite build && powershell -NoProfile -ExecutionPolicy Bypass -File scripts/copy-static.ps1 && powershell -NoProfile -ExecutionPolicy Bypass -File scripts/archive-h5.ps1",

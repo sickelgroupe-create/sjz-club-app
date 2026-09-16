@@ -1,6 +1,7 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { normalizeLineEndings } from './repository-text.mjs'
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const pages = JSON.parse(fs.readFileSync(path.join(root, 'pages.json'), 'utf8')).pages.map(item => `/${item.path}`)
@@ -19,7 +20,7 @@ const check = process.argv.includes('--check')
 
 for (const target of targets) {
   if (check) {
-    if (!fs.existsSync(target) || fs.readFileSync(target, 'utf8') !== content) {
+    if (!fs.existsSync(target) || normalizeLineEndings(fs.readFileSync(target, 'utf8')) !== content) {
       console.error(`路由清单未同步：${target}`)
       process.exitCode = 1
     }

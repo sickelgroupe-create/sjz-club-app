@@ -31,7 +31,7 @@ for (let index = 1; index <= 10; index++) {
 
 requireText('pages/order/submit.vue', ["!/^1[3-9]\\d{9}$/.test(phone)", "'/pages/order/payment?id='+order.id", '联系电话（必填）'])
 requireText('pages/order/payment.vue', ['请在30分钟内完成支付', '微信支付', '余额支付', 'remainingSeconds', 'api.payOrder(this.orderId,method', 'uni.requestPayment', 'api.syncWechatPayment'])
-requireText('pages/order/payment-result.vue', ['重新支付', '查看订单', "this.status='expired'", "this.status='success'", 'decodeURIComponent(decoded)', "'/pages/order/detail?id='+this.orderId"])
+requireText('pages/order/payment-result.vue', ['重新支付', '查看订单', "this.order.cancelReason==='payment_timeout'?'expired':'cancelled'", "this.status='success'", 'decodeURIComponent(decoded)', "'/pages/order/detail?id='+this.orderId"])
 requireText('pages/order/list.vue', ['@select="detail(item)"', "'/pages/order/detail?id='+item.id", '@tap.stop="pay(item)"'])
 requireText('pages/order/detail.vue', ['订单详情', '订单流转', 'timelineItems', 'api.getOrder(this.orderId)', 'this.order?.logs'])
 
@@ -48,7 +48,8 @@ if (/api\.phoneCodeLogin|requestPhoneCode|模拟验证码|验证码登录/.test(
 const recharge = requireText('pages/wallet/recharge.vue', ['微信支付充值', 'payRecharge(', 'api.createRecharge'])
 requireText('services/recharge.js', ['uni.requestPayment', 'api.syncWechatRecharge', "result.order?.status === 'success'"])
 if (/mockRecharge/.test(recharge)) errors.push('充值中心不能使用本地假充值数据')
-if (!recharge.includes("sandbox?'模拟充值'") || !recharge.includes('if(!api.sandbox)')) errors.push('模拟充值必须受独立联调模式限制，不能进入原环境')
+requireText('services/config.js', ['USE_MOCK = false', "RUNTIME_MODE = 'live'"])
+if (/api\.sandbox|mockRecharge/.test(recharge)) errors.push('充值页面不能依赖已退役的模拟环境')
 requireText('pages/account/bind.vue', ['oldPassword', 'confirmPassword', 'wechatCode'])
 const floatingCustomer = requireText('components/ui-floating-actions.vue', ['service.enabled && service.avatar', '/pages/service/customer', 'api.getCustomerService()'])
 const customerPage = requireText('pages/service/customer.vue', ['service.enabled', '客服暂未配置', 'api.getCustomerService()'])
@@ -58,7 +59,7 @@ if (customerPage.includes("avatar:'/static/images/customer-cartoon.png'")) error
 const allSource = [
   ...fs.readdirSync(path.join(root, 'pages'), { recursive: true, encoding: 'utf8' })
     .filter(name => name.endsWith('.vue')).map(name => read(path.join('pages', name))),
-  read('components/ui-floating-actions.vue'), read('mock/data.js')
+  read('components/ui-floating-actions.vue'), read('services/config.js')
 ].join('\n')
 if (/自豪电竞俱乐部|自豪电竞/.test(allSource)) errors.push('前端源文件仍包含旧品牌名称')
 
