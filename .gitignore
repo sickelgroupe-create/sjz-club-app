@@ -23,3 +23,6 @@
 **/*.jar
 **/*.dump
 **/*.bak
+**/local-private/
+# Approved local visual references; generated screenshot reports are not source.
+/tests/visual-round-2/
